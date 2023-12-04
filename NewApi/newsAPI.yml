@@ -1,0 +1,491 @@
+openapi: "3.0.2"
+info:
+  title: API Golang
+  description: Ini adalah API spec untuk belajar API BE 19 Alta
+  version: "1.0"
+  contact:
+    name: Hanapi Bagas Pamungkas
+    email: hanafibagas@gmail.com
+servers:
+  - url: http://127.0.0.1:8000
+    description: Local Development
+paths:
+  /comment:
+    post:
+      tags:
+        - comment
+      summary: tambah postingan
+      operationId: addComment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommentRequest"
+          application/xml:
+            schema:
+              $ref: "#/components/schemas/CommentRequest"
+      responses:
+        "201":
+          description: Comment added successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommentResponse"
+            application/xml:
+              schema:
+                $ref: "#/components/schemas/CommentResponse"
+        "400":
+          description: Invalid input
+        "401":
+          description: Unauthorized
+        "404":
+          description: Posting not found
+      security:
+        - bearerAuth: []
+
+  /comment/{commentId}:
+    delete:
+      tags:
+        - comment
+      summary: Delete a comment by ID
+      operationId: deleteComment
+      parameters:
+        - name: commentId
+          in: path
+          description: ID of the comment to delete
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "204":
+          description: Comment deleted successfully
+          content:
+            application/json:
+              example:
+                commentId: 123
+        "401":
+          description: Unauthorized
+        "404":
+          description: Comment not found
+      security:
+        - bearerAuth: []
+
+  /comment/{postId}:
+    get:
+      tags:
+        - comment
+      summary: menampilkan semua commet by id postingan
+      operationId: getCommentsByPostId
+      parameters:
+        - name: postId
+          in: path
+          description: ID of the post to get comments for
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CommentResponse"
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CommentResponse"
+        "404":
+          description: Post not found
+      security: []
+
+  /posting/{id}:
+    get:
+      tags:
+        - posting
+      summary: Untuk menampilakan postingan by id
+      operationId: getPostingById
+      parameters:
+        - name: id
+          in: path
+          description: ID of the posting to retrieve
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostingRequest"
+            application/xml:
+              schema:
+                $ref: "#/components/schemas/PostingResponse"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Posting not found
+      security: []
+
+    put:
+      tags:
+        - posting
+      summary: Untuk melakukan update by id
+      operationId: updatePostingById
+      parameters:
+        - name: id
+          in: path
+          description: ID of the posting to update
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostingRequest"
+          application/xml:
+            schema:
+              $ref: "#/components/schemas/PostingRequest"
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostingResponse"
+            application/xml:
+              schema:
+                $ref: "#/components/schemas/PostingResponse"
+        "400":
+          description: Invalid input
+        "401":
+          description: Unauthorized
+        "404":
+          description: Posting not found
+      security:
+        - bearerAuth: []
+
+    delete:
+      tags:
+        - posting
+      summary: Hapus postingan by id
+      operationId: deletePostingById
+      parameters:
+        - name: id
+          in: path
+          description: ID of the posting to delete
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "204":
+          description: Successful operation
+        "401":
+          description: Unauthorized
+        "404":
+          description: Posting not found
+      security:
+        - bearerAuth: []
+
+    post:
+      tags:
+        - posting
+      summary: Create postingan
+      operationId: createPosting
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostingRequest"
+          application/xml:
+            schema:
+              $ref: "#/components/schemas/PostingRequest"
+      responses:
+        "201":
+          description: Posting created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostingResponse"
+            application/xml:
+              schema:
+                $ref: "#/components/schemas/PostingResponse"
+        "400":
+          description: Invalid input
+      security:
+        - bearerAuth: []
+
+  /posting:
+    get:
+      tags:
+        - posting
+      summary: menampilkan keseluruhan data
+      operationId: getAllPostings
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  gambar:
+                    type: string
+                  cerita:
+                    type: string
+                  artikel:
+                    type: string
+                  user:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/UserResponse"
+            application/xml:
+              schema:
+                type: object
+                properties:
+                  gambar:
+                    type: string
+                  cerita:
+                    type: string
+                  artikel:
+                    type: string
+                  user:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/UserResponse"
+        "401":
+          description: Unauthorized
+      security: []
+
+  /user/login:
+    get:
+      tags:
+        - user
+      summary: Login
+      operationId: loginUser
+      parameters:
+        - name: username
+          in: query
+          description: The user name for login
+          required: true
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: The password for login in clear text
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+          headers:
+            X-Rate-Limit:
+              description: Calls per hour allowed by the user
+              schema:
+                type: integer
+                format: int32
+            X-Expires-After:
+              description: Date in UTC when the token expires
+              schema:
+                type: string
+                format: date-time
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string
+                    description: The user name
+                  token:
+                    type: string
+                    description: The authentication token
+        "400":
+          description: Invalid username/password supplied
+      security:
+        - bearerAuth: []
+
+  /user/me:
+    get:
+      tags:
+        - user
+      summary: menampilkan data user
+      operationId: getCurrentUser
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+            application/xml:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+      security:
+        - bearerAuth: []
+
+  /user/register:
+    post:
+      tags:
+        - user
+      summary: regiter user
+      operationId: registerUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+          application/xml:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        "201":
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+            application/xml:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Invalid input
+        "409":
+          description: User already exists
+      security: []
+
+  /user/{username}:
+    delete:
+      tags:
+        - user
+      summary: Delete user
+      description: This can only be done by the logged-in user.
+      operationId: deleteUser
+      parameters:
+        - name: username
+          in: path
+          description: The name that needs to be deleted
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: User deleted successfully
+        "400":
+          description: Invalid username supplied
+        "404":
+          description: User not found
+      security:
+        - bearerAuth: []
+
+components:
+  schemas:
+    CommentRequest:
+      type: object
+      properties:
+        postId:
+          type: integer
+          format: int64
+        user:
+          $ref: "#/components/schemas/UserResponse"
+        text:
+          type: string
+
+    CommentResponse:
+      type: object
+      properties:
+        postId:
+          type: integer
+          format: int64
+        commentId:
+          type: integer
+          format: int64
+        user:
+          $ref: "#/components/schemas/UserResponse"
+        text:
+          type: string
+
+    UserResponse:
+      type: object
+      properties:
+        nama:
+          type: string
+        email:
+          type: string
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        username:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        phone:
+          type: string
+        userStatus:
+          type: integer
+          format: int32
+          description: User Status
+      xml:
+        name: User
+
+    PostingRequest:
+      type: object
+      properties:
+        gambar:
+          type: string
+          format: binary
+        cerita:
+          type: string
+        artikel:
+          type: string
+        userId:
+          type: integer
+          format: int64
+
+    PostingResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        gambar:
+          type: string
+          format: binary
+        cerita:
+          type: string
+        artikel:
+          type: string
+        user:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserResponse"
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - bearerAuth: []
