@@ -14,7 +14,7 @@ paths:
     post:
       tags:
         - comment
-      summary: tambah postingan
+      summary: tambah comment
       operationId: addComment
       requestBody:
         content:
@@ -36,10 +36,22 @@ paths:
                 $ref: "#/components/schemas/CommentResponse"
         "400":
           description: Invalid input
+          content:
+            aplication/json:
+              example:
+                message: "Invalid input!"
         "401":
           description: Unauthorized
+          content:
+            aplication/json:
+              example:
+                message: "You don't authorize!"
         "404":
           description: Posting not found
+          content:
+            aplication/json:
+              example:
+                message: "Posting not found!"
       security:
         - bearerAuth: []
 
@@ -63,7 +75,7 @@ paths:
           content:
             application/json:
               example:
-                commentId: 123
+                message: "Comment berhasil di hapus!"
         "401":
           description: Unauthorized
         "404":
@@ -406,24 +418,21 @@ components:
     CommentResponse:
       type: object
       properties:
-        postId:
-          type: integer
-          format: int64
-        commentId:
-          type: integer
-          format: int64
         user:
           $ref: "#/components/schemas/UserResponse"
         text:
           type: string
+          example: "Ini adalah sebuah comment"
 
     UserResponse:
       type: object
       properties:
         nama:
           type: string
+          example: "budi"
         email:
           type: string
+          example: "budi2014@gmail.com"
 
     User:
       type: object
@@ -453,6 +462,9 @@ components:
     PostingRequest:
       type: object
       properties:
+        id:
+          type: integer
+          format: int64
         gambar:
           type: string
           format: binary
@@ -463,6 +475,12 @@ components:
         userId:
           type: integer
           format: int64
+      required:
+        - id
+        - gambar
+        - cerita
+        - artikel
+        - userId
 
     PostingResponse:
       type: object
@@ -477,9 +495,21 @@ components:
         artikel:
           type: string
         user:
-          type: array
-          items:
-            $ref: "#/components/schemas/UserResponse"
+          type: object
+          properties:
+            id:
+              type: integer
+              format: int64
+            nama:
+              type: string
+            email:
+              type: string
+      required:
+        - id
+        - gambar
+        - cerita
+        - artikel
+        - user
 
   securitySchemes:
     bearerAuth:
