@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/labstack/echo/v4"
-	// "golang.org/x/crypto/bcrypt"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserController struct {
@@ -30,20 +30,20 @@ func (uc *UserController) Register() echo.HandlerFunc {
 			})
 		}
 
-		// hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
-		// if err != nil {
-		// 	return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-		// 		"message": "terjadi permasalahan ketika mengenkripsi data",
-		// 	})
-		// }
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"message": "terjadi permasalahan ketika mengenkripsi data",
+			})
+		}
 
 		var inputProses = new(user.User)
 		inputProses.Email = input.Email
 		inputProses.PhoneNumber = input.PhoneNumber
 		inputProses.FullName = input.FullName
 		inputProses.UserName = input.UserName
-		// inputProses.Password = string(hashedPassword)
-		inputProses.Password = input.Password
+		inputProses.Password = string(hashedPassword)
+		// inputProses.Password = input.Password
 
 		result, err := uc.srv.Register(*inputProses)
 		if err != nil {
@@ -84,44 +84,48 @@ func (uc *UserController) Login() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var input = new(LoginRequest)
 		if err := c.Bind(input); err != nil {
-			return c.JSON(http.StatusBadRequest, map[string]any{
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
 				"message": "input yang diberikan tidak sesuai",
 			})
 		}
 
-		result, err := uc.srv.Login(input.Email, input.Password)
-
+		// Retrieve user data from the service
+		userData, err := uc.srv.GetUserByEmail(input.Email)
 		if err != nil {
 			c.Logger().Error("ERROR Login, explain:", err.Error())
 			if strings.Contains(err.Error(), "not found") {
-				return c.JSON(http.StatusNotFound, map[string]any{
+				return c.JSON(http.StatusNotFound, map[string]interface{}{
 					"message": "pengguna tidak ditemukan",
 				})
 			}
-			if strings.Contains(err.Error(), "password salah") {
-				return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-					"message": "password salah",
-				})
-			}
-			return c.JSON(http.StatusInternalServerError, map[string]any{
-				"message": "pengguna tidak di temukan",
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"message": "terjadi kesalahan",
 			})
 		}
 
-		strToken, err := jwt.GenerateJWT(result.ID)
+		// Compare the input password with the stored hashed password
+		err = bcrypt.CompareHashAndPassword([]byte(userData.Password), []byte(input.Password))
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, map[string]any{
+			return c.JSON(http.StatusUnauthorized, map[string]interface{}{
+				"message": "password salah",
+			})
+		}
+
+		// Password is correct, generate JWT token
+		strToken, err := jwt.GenerateJWT(userData.ID)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 				"message": "terjadi permasalahan ketika mengenkripsi data",
 			})
 		}
 
 		var response = new(LoginResponse)
-		response.ID = result.ID
-		response.Email = result.Email
+		response.ID = userData.ID
+		response.Email = userData.Email
 		response.Token = strToken
 
-		return c.JSON(http.StatusOK, map[string]any{
-			"message": "success create data",
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"message": "success",
 			"data":    response,
 		})
 	}
