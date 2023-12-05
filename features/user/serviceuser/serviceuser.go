@@ -56,7 +56,7 @@ func (us *userService) Login(email string, password string) (user.User, error) {
 func (us *userService) GetUserByEmail(email string) (user.User, error) {
 	result, err := us.repo.GetUserByEmail(email)
 	if err != nil {
-		return user.User{}, err // Adjust the error handling as needed
+		return user.User{}, err
 	}
 	return result, nil
 }

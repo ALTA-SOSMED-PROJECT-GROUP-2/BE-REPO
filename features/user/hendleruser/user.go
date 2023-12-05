@@ -89,7 +89,6 @@ func (uc *UserController) Login() echo.HandlerFunc {
 			})
 		}
 
-		// Retrieve user data from the service
 		userData, err := uc.srv.GetUserByEmail(input.Email)
 		if err != nil {
 			c.Logger().Error("ERROR Login, explain:", err.Error())
@@ -102,8 +101,6 @@ func (uc *UserController) Login() echo.HandlerFunc {
 				"message": "terjadi kesalahan",
 			})
 		}
-
-		// Compare the input password with the stored hashed password
 		err = bcrypt.CompareHashAndPassword([]byte(userData.Password), []byte(input.Password))
 		if err != nil {
 			return c.JSON(http.StatusUnauthorized, map[string]interface{}{
@@ -111,7 +108,6 @@ func (uc *UserController) Login() echo.HandlerFunc {
 			})
 		}
 
-		// Password is correct, generate JWT token
 		strToken, err := jwt.GenerateJWT(userData.ID)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
