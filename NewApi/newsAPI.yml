@@ -14,16 +14,16 @@ paths:
     post:
       tags:
         - comment
-      summary: tambah comment
+      summary: Add Comment
+      description: Add Comment in user posting
       operationId: addComment
       requestBody:
+        required: true
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/CommentRequest"
-          application/xml:
-            schema:
-              $ref: "#/components/schemas/CommentRequest"
+
       responses:
         "201":
           description: Comment added successfully
@@ -78,8 +78,16 @@ paths:
                 message: "Comment berhasil di hapus!"
         "401":
           description: Unauthorized
+          content:
+            aplication/json:
+              example:
+                message: "You don't authorize!"
         "404":
           description: Comment not found
+          content:
+            aplication/json:
+              example:
+                message: "Comment not found!"
       security:
         - bearerAuth: []
 
@@ -113,6 +121,58 @@ paths:
                   $ref: "#/components/schemas/CommentResponse"
         "404":
           description: Post not found
+      security: []
+
+  /posting:
+    post:
+      tags:
+        - posting
+      summary: Create postingan
+      operationId: createPosting
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostingRequest"
+      responses:
+        "201":
+          description: Posting created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PostingResponse"
+                  message:
+                    type: string
+                    example: Posting created successfully!
+        "400":
+          description: Invalid input
+      security:
+        - bearerAuth: []
+    get:
+      tags:
+        - posting
+      summary: Get all created posting
+      operationId: getAllPostings
+      responses:
+        "200":
+          description: Get all created posting
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PostingResponse"
+        "401":
+          description: Unauthorized
       security: []
 
   /posting/{id}:
@@ -208,77 +268,7 @@ paths:
       security:
         - bearerAuth: []
 
-    post:
-      tags:
-        - posting
-      summary: Create postingan
-      operationId: createPosting
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/PostingRequest"
-          application/xml:
-            schema:
-              $ref: "#/components/schemas/PostingRequest"
-      responses:
-        "201":
-          description: Posting created successfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/PostingResponse"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/PostingResponse"
-        "400":
-          description: Invalid input
-      security:
-        - bearerAuth: []
-
-  /posting:
-    get:
-      tags:
-        - posting
-      summary: menampilkan keseluruhan data
-      operationId: getAllPostings
-      responses:
-        "200":
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  gambar:
-                    type: string
-                  cerita:
-                    type: string
-                  artikel:
-                    type: string
-                  user:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/UserResponse"
-            application/xml:
-              schema:
-                type: object
-                properties:
-                  gambar:
-                    type: string
-                  cerita:
-                    type: string
-                  artikel:
-                    type: string
-                  user:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/UserResponse"
-        "401":
-          description: Unauthorized
-      security: []
-
-  /user/login:
+  /login:
     get:
       tags:
         - user
@@ -327,7 +317,7 @@ paths:
       security:
         - bearerAuth: []
 
-  /user/me:
+  /users:
     get:
       tags:
         - user
@@ -348,11 +338,11 @@ paths:
       security:
         - bearerAuth: []
 
-  /user/register:
+  /register:
     post:
       tags:
         - user
-      summary: regiter user
+      summary: register user
       operationId: registerUser
       requestBody:
         content:
@@ -378,7 +368,7 @@ paths:
           description: User already exists
       security: []
 
-  /user/{username}:
+  /user/{id}:
     delete:
       tags:
         - user
@@ -386,7 +376,7 @@ paths:
       description: This can only be done by the logged-in user.
       operationId: deleteUser
       parameters:
-        - name: username
+        - name: id
           in: path
           description: The name that needs to be deleted
           required: true
@@ -407,22 +397,25 @@ components:
     CommentRequest:
       type: object
       properties:
-        postId:
+        id:
           type: integer
           format: int64
-        user:
-          $ref: "#/components/schemas/UserResponse"
-        text:
+          example: 1
+        user_id:
+          type: integer
+          example: 12
+        comment:
           type: string
+          example: Ini Sebuah comment
 
     CommentResponse:
       type: object
       properties:
-        user:
-          $ref: "#/components/schemas/UserResponse"
-        text:
+        data:
+          $ref: "#/components/schemas/CommentRequest"
+        message:
           type: string
-          example: "Ini adalah sebuah comment"
+          example: "Comment added successfully"
 
     UserResponse:
       type: object
@@ -459,57 +452,46 @@ components:
       xml:
         name: User
 
+    Image:
+      type: object
+      properties:
+        title:
+          type: string
+          example: gambar1
+        link:
+          type: string
+          example: https://google.com
+
     PostingRequest:
       type: object
       properties:
-        id:
-          type: integer
-          format: int64
-        gambar:
+        title:
           type: string
-          format: binary
-        cerita:
+          example: Belajar membaca
+        image:
+          type: array
+          items:
+            $ref: "#/components/schemas/Image"
+        description:
           type: string
-        artikel:
-          type: string
-        userId:
-          type: integer
-          format: int64
+          example: halo dunia tipu tipu!
       required:
-        - id
-        - gambar
-        - cerita
-        - artikel
-        - userId
+        - title
 
     PostingResponse:
       type: object
       properties:
         id:
+          type: integer
+          example: 1
+        title:
           type: string
-        gambar:
+          example: Belajar membaca
+        image:
+          $ref: "#/components/schemas/Image"
+        description:
           type: string
-          format: binary
-        cerita:
-          type: string
-        artikel:
-          type: string
-        user:
-          type: object
-          properties:
-            id:
-              type: integer
-              format: int64
-            nama:
-              type: string
-            email:
-              type: string
-      required:
-        - id
-        - gambar
-        - cerita
-        - artikel
-        - user
+          example: halo dunia tipu tipu!
 
   securitySchemes:
     bearerAuth:
