@@ -8,6 +8,7 @@ type User struct {
 	FullName    string
 	UserName    string
 	PhoneNumber string
+	Image       string
 	Password    string
 }
 

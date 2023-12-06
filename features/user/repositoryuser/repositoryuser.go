@@ -14,6 +14,7 @@ type UserModel struct {
 	FullName      string
 	UserName      string
 	PhoneNumber   string
+	Image         string
 	Password      string
 	PostingModel  []repositoryposting.PostingModel `gorm:"foreignKey:UserID"`
 	CommentModels []repositorycomment.CommentModel `gorm:"foreignKey:UserID"`

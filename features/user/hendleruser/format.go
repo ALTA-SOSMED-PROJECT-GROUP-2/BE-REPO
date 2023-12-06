@@ -14,6 +14,7 @@ type UserResponse struct {
 	PhoneNumber string `json:"phone_number"`
 	FullName    string `json:"full_name"`
 	UserName    string `json:"user_name"`
+	Image       string `json:"image"`
 	Token       string `json:"token"`
 }
 
