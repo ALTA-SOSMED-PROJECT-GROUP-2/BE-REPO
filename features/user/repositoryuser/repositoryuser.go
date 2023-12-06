@@ -1,7 +1,7 @@
 package repositoryuser
 
 import (
-	"BE-REPO/features/comment/repositorycomment"
+	"BE-REPO/features/comment/model"
 	"BE-REPO/features/posting/repositoryposting"
 	"BE-REPO/features/user"
 
@@ -16,7 +16,7 @@ type UserModel struct {
 	PhoneNumber   string
 	Password      string
 	PostingModel  []repositoryposting.PostingModel `gorm:"foreignKey:UserID"`
-	CommentModels []repositorycomment.CommentModel `gorm:"foreignKey:UserID"`
+	CommentModels []model.Comment                  `gorm:"foreignKey:UserID"`
 }
 
 type userQuery struct {
