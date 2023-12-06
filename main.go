@@ -2,7 +2,7 @@ package main
 
 import (
 	"BE-REPO/config"
-	bu "BE-REPO/features/comment/repositorycomment"
+	"BE-REPO/features/comment/model"
 	pu "BE-REPO/features/posting/repositoryposting"
 	uh "BE-REPO/features/user/hendleruser"
 	ur "BE-REPO/features/user/repositoryuser"
@@ -26,7 +26,7 @@ func main() {
 		e.Logger.Fatal("tidak bisa start bro", err.Error())
 	}
 
-	db.AutoMigrate(&ur.UserModel{}, &pu.PostingModel{}, &bu.CommentModel{})
+	db.AutoMigrate(&ur.UserModel{}, &pu.PostingModel{}, &model.Comment{})
 
 	// hash := enkrip.New()
 	userRepo := ur.New(db)
