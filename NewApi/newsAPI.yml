@@ -17,13 +17,12 @@ paths:
       summary: Add Comment
       description: Add Comment in user posting
       operationId: addComment
-      parameters:
-        - name: commentData
-          in: query
-          description: comment data object
-          required: true
-          schema:
-            $ref: "#/components/schemas/CommentRequest"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommentRequest"
 
       responses:
         "201":
