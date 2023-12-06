@@ -19,9 +19,11 @@ type Handler interface {
 type Service interface {
 	Register(newUser User) (User, error)
 	Login(email string, password string) (User, error)
+	GetUserByEmail(email string) (User, error)
 }
 
 type Repository interface {
 	Insert(newUser User) (User, error)
 	Login(email string, password string) (User, error)
+	GetUserByEmail(email string) (User, error)
 }

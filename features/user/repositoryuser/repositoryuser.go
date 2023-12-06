@@ -60,3 +60,18 @@ func (uq *userQuery) Login(email string, password string) (user.User, error) {
 
 	return *result, nil
 }
+
+func (uq *userQuery) GetUserByEmail(email string) (user.User, error) {
+	var userData = new(UserModel)
+
+	if err := uq.DB.Where("email = ?", email).First(userData).Error; err != nil {
+		return user.User{}, err
+	}
+
+	var result = new(user.User)
+	result.ID = userData.ID
+	result.Email = userData.Email
+	result.Password = userData.Password
+
+	return *result, nil
+}
